@@ -1,0 +1,21 @@
+сценарий аренды:
+1.Пользователь нажимает "Взять" → фронтенд вызывает API
+2.API вызывает сервис rentals/services.py: initiate_rental(rental_id)
+3.Сервис меняет статус аренды через FSM: RESERVED → COMMAND_SENT
+4.Сервис вызывает hardware-сервис hardware/services.py: send_open_command(slot_id)
+5.Hardware-сервис отправляет команду на контроллер (или эмулятор)
+6.Контроллер отвечает → hardware-сервис принимает событие door_opened
+7.Hardware-сервис вызывает rental-сервис rentals/services.py: confirm_door_opened(rental_id)
+8.Rental-сервис меняет статус через FSM: COMMAND_SENT → DOOR_OPENED
+
+API (DRF View)
+  ↓
+Rental Service (rentals/services.py)
+  ↓ меняет статус через FSM
+  ↓ вызывает
+Hardware Service (hardware/services.py)
+  ↓ отправляет команду
+  ↓ принимает событие
+  ↓ вызывает callback
+Rental Service (rentals/services.py)
+  ↓ меняет статус через FSM

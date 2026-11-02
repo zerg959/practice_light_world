@@ -1,0 +1,49 @@
+# ============================================================
+# Core
+# ============================================================
+Django>=5.2,<5.3
+djangorestframework>=3.16
+djangorestframework-simplejwt>=5.5
+python-dotenv>=1.0
+
+# ============================================================
+# Database & Media
+# ============================================================
+psycopg[binary]>=3.2      # PostgreSQL driver (v3)
+Pillow>=11.0              # ImageField
+
+# ============================================================
+# API & Integrations
+# ============================================================
+django-cors-headers>=4.7  # CORS for React (browser)
+drf-spectacular>=0.28     # OpenAPI / Swagger
+django-filter>=25.1
+
+# ============================================================
+# Django Admin & Utils
+# ============================================================
+django-jazzmin>=3.0
+django-extensions>=4.1    # graph_models, shell_plus
+pydot>=3.0                # ER-engine diagram (+ system graphviz!)
+django-fsm-2>=3.0         # actual fork of django-fsm (state machine)
+
+# ============================================================
+# Testing & Debugging
+# ============================================================
+pytest>=8.0
+pytest-django>=4.9
+pytest-mock
+pytest-cov
+Faker
+time-machine              # tariff tests and timeout states
+django-debug-toolbar>=5.0
+
+# ============================================================
+# Linting & Formatting
+# ============================================================
+ruff   
+
+# ============================================================
+# Utils
+# ============================================================
+requests                  # for emulator and tests

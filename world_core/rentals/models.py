@@ -1,3 +1,16 @@
 from django.db import models
 
-# Create your models here.
+
+class Rental(models.Model):
+    '''
+    Модель для создания объекта Аренды
+    '''
+    pass
+
+
+class RentalEvent(models.Model):
+    '''
+    Модель для хранения реализованных Аренд,
+    необходима для хранения неизменяемых исторических данных
+    '''
+    pass
