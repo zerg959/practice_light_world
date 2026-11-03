@@ -16,7 +16,7 @@ class User(models.Model):
         help_text='Уникальное имя пользователя'
         )
 
-    role = models.TextChoices(
+    role = models.CharField(
         max_length=10,
         choices=Role.choices,
         default=Role.USER,

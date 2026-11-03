@@ -10,10 +10,6 @@ class Station(models.Model):
     class Status(models.TextChoices):
         ONLINE = ('online', 'Онлайн')
         OFFLINE = ('offline', 'Офлайн')
-    slots = models.ForeignKey(
-        'slots.Slot'
-    )
-
     location = models.CharField() # заменить на координаты?
     current_applied_config_version = models.ForeignKey(
         'stations.StationConfig'
@@ -48,7 +44,7 @@ class StationConfig(models.Model):
         auto_now_add=True,
         verbose_name='Дата создания конфигурации'
     )
-    created_by = models.ForeignKey()
+    created_by = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name = 'Конфигурация'
@@ -57,3 +53,9 @@ class StationConfig(models.Model):
 
     def __str__(self) -> str:
         return f'Версия: {self.version_number}, от {self.created_at}'
+
+
+class Controller(models.Model):
+    name = models.CharField(max_length=100)
+    serial_number = models.CharField(max_length=100, unique=True)
+    station = models.ForeignKey('stations.Station', on_delete=models.CASCADE)
