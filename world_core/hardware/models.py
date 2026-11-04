@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import (MinValueValidator, MaxValueValidator)
+from django.models import Q
 import uuid
 
 class HardwareCommand(models.Model):
@@ -30,7 +31,6 @@ class HardwareCommand(models.Model):
         FAILED = ("failed", "Неудачно") 
         TIMEOUT = ("timeout", "Таймаут")
         CANCELLED = ("cancelled", "Отменено")
-        
 
     id = models.UUIDField(
         primary_key=True,
@@ -38,18 +38,20 @@ class HardwareCommand(models.Model):
         editable=False,
         help_text="Уникальный идентификатор команды (UUID4)"
     )
+
     controller = models.ForeignKey(
         "stations.Controller",
         on_delete=models.CASCADE,
         related_name="commands",
         help_text="Контроллер",
         )
+
     channel = models.IntegerField(
         validators=[
             MinValueValidator(1, message='Номер канала не может быть меньше 1'),
             MaxValueValidator(16, message='Номер канала не может быть больше 16')
             ],
-        help_text="Номер канала (1–16)."
+        help_text="Номер канала (1-16)."
         "На один канал одного контроллера может быть только одна активная команда "
         "(со статусом pending или sent)."
         "Повторная активная команда вызовет ошибку 400/409."
@@ -60,9 +62,10 @@ class HardwareCommand(models.Model):
         choices=CommandType.choices,
         default=CommandType.GET_STATUS,
         help_text=(
-        "Тип команды. "
-        "Комбинация (controller, channel, command_type) должна быть уникальной "
-        "среди активных команд (pending/sent)."
+            "Тип команды."
+            "Комбинация (controller, channel, command_type)"
+            "должна быть уникальной"
+            "среди активных команд (pending/sent)."
         )
     )
     status = models.CharField(
@@ -83,21 +86,20 @@ class HardwareCommand(models.Model):
             models.Index(fields=['controller', 'status'], name='hw_cntrl_status_index'),
             models.Index(fields=['status'], name='hw_status_index')
             ]
-        ordering=('created_at',)
+        ordering = ('created_at',)
         verbose_name = "Очередь исходящих команд"
         verbose_name_plural = "Очереди исходящих команд"
         constraints = models.UniqueConstraint(
-            fields=['controller','status','command_type'],
-            condition=Q(status__in=['sent','pending']),
-            name='unique_active_command_per_channel',
-            help_text=''
+            fields=['controller', 'status', 'command_type'],
+            condition=Q(status__in=['sent', 'pending']),
+            name='unique_active_command_per_channel'
         )
-    
+
     def __str__(self):
         return f"""
-        - Контроллер: {self.controller} 
-        - Канал: {self.channel} 
-        - Команда: {self.command_type} 
+        - Контроллер: {self.controller}
+        - Канал: {self.channel}
+        - Команда: {self.command_type}
         - Статус: {self.status}"""
 
 
@@ -115,8 +117,10 @@ class SensorEvent(models.Model):
         ERROR = ('error', 'Ошибка')
 
     class ProcessStatus(models.TextChoices):
-        pass
-    
+        PENDING = ('pending', 'Ожидает обработки')
+        DONE = ('done', 'Обработано')
+        FAILED = ('failed', 'Ошибка обработки')
+
 
     id = models.UUIDField(
         primary_key=True,
@@ -151,14 +155,27 @@ class SensorEvent(models.Model):
         auto_now_add=True,
         help_text="Серверное время события"
         )
-    processed = models.BooleanField(default=False) # если повторная обработка не удалась
+    processing_staus = models.CharField(
+        max_length=20,
+        choices = ProcessStatus.choices,
+        default = ProcessStatus.PENDING,
+        help_text = "Статус обработки события"
+    )
+    processed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Время завершения обработки"
+    )
     processing_error = models.CharField(
         max_length=1000, 
         null=True, 
         blank=True,
         help_text="Поле для записи ошибок внешнего элемента"
         )
-    
+    attempts = models.PositiveSmallIntegerField(
+        default=0,
+        help_text="Количество попыток обработки"
+    )
         # В воркере, который разбирает события:
         # Перед попыткой: attempts += 1.
         # Удалось: status = DONE, processed_at = timezone.now(), processing_error = None.
