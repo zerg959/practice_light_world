@@ -9,6 +9,7 @@ class Slot(models.Model):
     Одна Ячейка в моменте может быть связана только с одним Предметом.
     Одна Ячейка управляется одним Каналом Контроллера.
     Уникальность связи реализована в Meta.constraints модели.
+    И Ячейка, и Канал должны быть заполнены или незаполнены: check_constraint в Meta.
     ВАЖНО:
     Прямая привязка Ячейка - Станция в модели отсутствует.
     Станция и Ячейка связаны только через модель Контроллер.
@@ -38,7 +39,6 @@ class Slot(models.Model):
         h_LARGE = 60, "60 см"
 
     slot_number = models.PositiveSmallIntegerField(
-        max_length=2,
         null=True,
         blank=True,
         validators=[
@@ -49,21 +49,17 @@ class Slot(models.Model):
         help_text="Номер Ячейки в Станции"
     ) # поменять на Choice?
 
-    width = models.CharField(
-        max_length=3,
+    width = models.PositiveSmallIntegerField(
         choices=SlotWidth.choices,
         null=True,
         blank=True,
-        default=None,
         verbose_name="Высота ячейки, см",
         help_text="Выбор габарита ячейки по высоте (см)"
     )
-    height = models.CharField(
-        max_length=3,
+    height = models.PositiveSmallIntegerField(
         choices=SlotHeight.choices,
         null=True,
         blank=True,
-        default=None,
         verbose_name="Ширина ячейки, см",
         help_text="Выбор габарита ячейки по ширине (см)"
     )
@@ -76,7 +72,7 @@ class Slot(models.Model):
         )
     controller = models.ForeignKey(
         'stations.Controller',
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="slots",
         null=True,
         blank=True,
@@ -84,7 +80,6 @@ class Slot(models.Model):
         help_text="Контроллер станции, в которой расположена ячейка"
         )
     controller_channel_num = models.PositiveSmallIntegerField(
-        max_length=2,
         null=True,
         blank=True,
         validators=[
@@ -99,6 +94,15 @@ class Slot(models.Model):
         verbose_name = "Ячейка"
         verbose_name_plural = "Ячейки"
         constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(controller__isnull=True,
+                             controller_channel_num__is_nul=True)
+                    | models.Q(controller__isnull=False,
+                               controller_channel_num__is_nul=False)
+                ),
+                name='slot_pair_cntrl_consistent'
+            ),
             models.UniqueConstraint(
                 fields=['controller', 'controller_channel_num'],
                 name="unique_cntrl_chnl_per_slot")
@@ -106,5 +110,5 @@ class Slot(models.Model):
 
     def __str__(self) -> str:
         if self.controller and self.controller.station_id:
-            return f"Ячейка {self.id} (канал {self.channel_number}, станция {self.controller.station_id})"
+            return f"Ячейка {self.id} (канал {self.controller_channel_num}, станция {self.controller.station_id})"
         return f"Ячейка {self.id} (не подключена)"
