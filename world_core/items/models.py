@@ -12,46 +12,54 @@ class Item(models.Model):
     '''
     name = models.CharField(
         max_length=200,
+        verbose_name="Название",
         help_text="Наименование Предмета"
     )
     image = models.CharField( # пока храним как ссылку
         max_length=2000,
         null=True,
         blank=True,
-        help_text="Картинка"
+        verbose_name="Фото",
+        help_text="Изображение предмета"
     )
     description = models.CharField(
         max_length=250,
         blank=True,
+        verbose_name="Описание предмета",
         help_text="Описание"
     )
     equipment = models.TextField(
         blank=True,
-        help_text="Комплектация"
+        verbose_name="Комплектация",
+        help_text="Перечень оборудования, входящего в аренду"
     )
     weight = models.DecimalField(
         max_digits=6,
         decimal_places=2,
         null=True,
         blank=True,
-        help_text="Вес, кг"
+        verbose_name="Вес",
+        help_text="Вес комплектации в кг"
         )
     height = models.DecimalField(
         max_digits=6,
         decimal_places=2,
         null=True,
         blank=True,
-        help_text="Высота, см"
+        verbose_name="Высота",
+        help_text="Высота в см"
         )
     width = models.DecimalField(
         max_digits=6,
         decimal_places=2,
         null=True,
         blank=True,
-        help_text="Ширина, см"
+        verbose_name="Ширина",
+        help_text="Ширина в см"
         )
     created_at = models.DateTimeField(
         auto_now_add=True,
+        verbose_name="Дата создания",
         help_text="Дата создания"
     )
 

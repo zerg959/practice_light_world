@@ -1,6 +1,7 @@
 from django.db import models
 from stations import Station, Controller
 
+
 class Slot(models.Model):
     '''
     Модель Ячейка.
