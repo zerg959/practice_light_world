@@ -2,6 +2,7 @@ from typing import Any
 from django.db import models
 from django.conf import settings
 
+
 class Station(models.Model):
     """
     Модель Станция.
@@ -10,6 +11,9 @@ class Station(models.Model):
     """
 
     class Status(models.TextChoices):
+        """
+        Возможные статусы станции.
+        """
         ONLINE = ('online', 'Онлайн')
         OFFLINE = ('offline', 'Офлайн')
 
@@ -52,7 +56,10 @@ class StationConfig(models.Model):
     Используемые (applied) версии записываются в БД и применяются в поле
     current_applied_config.
     '''
-    class Status(models.TextChoices):   # переименовать класс (в Станции тоже есть Статус)
+    class Status(models.TextChoices): 
+        """
+        Возможные статусы Конфигурации.
+        """
         PUBLISHED = ('published', 'Опубликовано') 
         APPLIED = ('applied', 'Применено')
         DEPRECATED = ('deprecated', 'Устарело')
@@ -123,6 +130,9 @@ class StationConfig(models.Model):
 class Controller(models.Model):
     """
     Модель Контроллер.
+    Осуществляет управление ячейкой через каналы (1-16).
+    Один контроллер на станцию, один канал на ячейку.
+    Связи Контроллер - Станция и Канал - Ячейка уникальны.
     """
     name = models.CharField(
         max_length=100,
