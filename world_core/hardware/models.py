@@ -1,7 +1,8 @@
 from django.db import models
 from django.core.validators import (MinValueValidator, MaxValueValidator)
-from django.models import Q
+from django.db.models import Q
 import uuid
+
 
 class HardwareCommand(models.Model):
     """
@@ -28,7 +29,7 @@ class HardwareCommand(models.Model):
         PENDING = ("pending", "Ожидание")
         SENT = ("sent", "Отправлено")
         ACKED = ("acked", "Подтверждено")
-        FAILED = ("failed", "Неудачно") 
+        FAILED = ("failed", "Неудачно")
         TIMEOUT = ("timeout", "Таймаут")
         CANCELLED = ("cancelled", "Отменено")
 
@@ -52,19 +53,19 @@ class HardwareCommand(models.Model):
             MaxValueValidator(16, message='Номер канала не может быть больше 16')
             ],
         help_text="Номер канала (1-16)."
-        "На один канал одного контроллера может быть только одна активная команда "
-        "(со статусом pending или sent)."
-        "Повторная активная команда вызовет ошибку 400/409."
-        "Реализовано через constrait в Meta"
+        "На один канал одного контроллера может быть только одна "
+        "активная команда (со статусом pending или sent). Повторная "
+        "активная команда вызовет ошибку 400/409. Реализовано через "
+        "constraints в Meta"
         )
     command_type = models.CharField(
         max_length=15,
         choices=CommandType.choices,
         default=CommandType.GET_STATUS,
         help_text=(
-            "Тип команды."
-            "Комбинация (controller, channel, command_type)"
-            "должна быть уникальной"
+            "Тип команды. "
+            "Комбинация (controller, channel, command_type) "
+            "должна быть уникальной "
             "среди активных команд (pending/sent)."
         )
     )
@@ -83,30 +84,35 @@ class HardwareCommand(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['controller', 'status'], name='hw_cntrl_status_index'),
+            models.Index(fields=['controller', 'status'],
+                         name='hw_cntrl_status_index'),
             models.Index(fields=['status'], name='hw_status_index')
             ]
-        ordering = ('created_at',)
+        ordering = ('-created_at',)
         verbose_name = "Очередь исходящих команд"
         verbose_name_plural = "Очереди исходящих команд"
-        constraints = models.UniqueConstraint(
-            fields=['controller', 'status', 'command_type'],
-            condition=Q(status__in=['sent', 'pending']),
-            name='unique_active_command_per_channel'
-        )
+        constraints = [
+            models.UniqueConstraint(
+                fields=['controller', 'channel', 'command_type'],
+                condition=Q(status__in=[Status.SENT, Status.PENDING]),
+                name='unique_active_command_per_channel')
+            ]
 
     def __str__(self):
-        return f"""
-        - Контроллер: {self.controller}
-        - Канал: {self.channel}
-        - Команда: {self.command_type}
-        - Статус: {self.status}"""
+        return f"Команда {self.command_type} на канал {self.channel} ({self.status})"
 
 
 class SensorEvent(models.Model):
-    '''
-    Журнал входящих событий (raw data) от Контроллера
-    '''
+    """
+    Журнал входящих событий (raw data) от Контроллера.
+
+    Примечание: В воркере, который разбирает события:
+    Перед попыткой: attempts += 1.
+    Удалось: processing_status = DONE, processed_at=timezone.now(), processing_error = None.
+    Не удалось: processing_status = FAILED, в processing_error пишем текст ошибки.
+    ретрай-воркер берёт всё с processing_status=FAILED (и, если нужно, attempts < N
+    (для ограничения попыток)).
+    """
     class EventType(models.TextChoices):
         """
         Типы событий от Контроллера.
@@ -121,7 +127,6 @@ class SensorEvent(models.Model):
         DONE = ('done', 'Обработано')
         FAILED = ('failed', 'Ошибка обработки')
 
-
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -131,6 +136,7 @@ class SensorEvent(models.Model):
     controller = models.ForeignKey(
         'stations.Controller',
         on_delete=models.PROTECT,
+        related_name="events",
         help_text="Контроллер"
         )
     channel = models.IntegerField(
@@ -142,24 +148,30 @@ class SensorEvent(models.Model):
         blank=True,
         help_text="Номер канала"
         )
+    event_type = models.CharField(
+        max_length=30,
+        choices=EventType.choices,
+        help_text="Тип события"
+    )
     raw_data = models.JSONField(
-        default='dict',
+        default=dict,
         blank=True,
         help_text=(
-        "Первичные данные от контроллера (JSON). "
-        "Содержит все сырые поля, включая внутренний ID события, коды ошибок и метки времени устройства. "
-        "Используется для аудита, отладки и повторной обработки."
+            "Первичные данные от контроллера (JSON). "
+            "Содержит все сырые поля, включая внутренний ID события, "
+            "коды ошибок и метки времени устройства. "
+            "Используется для аудита, отладки и повторной обработки. "
         )
     )
     received_at = models.DateTimeField(
         auto_now_add=True,
         help_text="Серверное время события"
         )
-    processing_staus = models.CharField(
+    processing_status = models.CharField(
         max_length=20,
-        choices = ProcessStatus.choices,
-        default = ProcessStatus.PENDING,
-        help_text = "Статус обработки события"
+        choices=ProcessStatus.choices,
+        default=ProcessStatus.PENDING,
+        help_text="Статус обработки события"
     )
     processed_at = models.DateTimeField(
         null=True,
@@ -167,8 +179,8 @@ class SensorEvent(models.Model):
         help_text="Время завершения обработки"
     )
     processing_error = models.CharField(
-        max_length=1000, 
-        null=True, 
+        max_length=1000,
+        null=True,
         blank=True,
         help_text="Поле для записи ошибок внешнего элемента"
         )
@@ -176,13 +188,17 @@ class SensorEvent(models.Model):
         default=0,
         help_text="Количество попыток обработки"
     )
-        # В воркере, который разбирает события:
-        # Перед попыткой: attempts += 1.
-        # Удалось: status = DONE, processed_at = timezone.now(), processing_error = None.
-        # Не удалось: status = FAILED, в processing_error пишем текст ошибки.
-        # ретрай-воркер берёт всё с status=FAILED (и, если нужно, attempts < N (для ограничения попыток)).
-    
-    class Meta:
-        verbose_name="Событие внешнего элемента"
-        verbose_name_plural="События внешних элементов"
 
+    class Meta:
+        verbose_name = "Событие внешнего элемента"
+        verbose_name_plural = "События внешних элементов"
+        ordering = ('-received_at',)
+        indexes = [
+            models.Index(fields=['controller', 'received_at'],
+                         name="event_cntrl_received_idx"),
+            models.Index(fields=['processing_status',],
+                         name="processing_status_idx")
+            ]
+
+    def __str__(self) -> str:
+        return f"{self.event_type} - {self.id} - {self.processing_status} - {self.controller} - {self.channel}"
