@@ -23,7 +23,7 @@ class Slot(models.Model):
 
     class SlotWidth(models.IntegerChoices):
         """
-        Высота Ячейки: возможные габариты.
+        Ширина Ячейки: возможные габариты.
         """
         w_XSMALL = 10, "10 см"
         w_SMALL = 20, "20 см"
@@ -32,7 +32,7 @@ class Slot(models.Model):
 
     class SlotHeight(models.IntegerChoices):
         """
-        Ширина Ячейки: возможные габариты.
+        Высота Ячейки: возможные габариты.
         """
         h_SMALL = 30, "30 см"
         h_MEDIUM = 40, "40 см"
@@ -53,15 +53,15 @@ class Slot(models.Model):
         choices=SlotWidth.choices,
         null=True,
         blank=True,
-        verbose_name="Высота ячейки, см",
-        help_text="Выбор габарита ячейки по высоте (см)"
+        verbose_name="Ширина ячейки, см",
+        help_text="Выбор габарита ячейки по Ширине (см)"
     )
     height = models.PositiveSmallIntegerField(
         choices=SlotHeight.choices,
         null=True,
         blank=True,
-        verbose_name="Ширина ячейки, см",
-        help_text="Выбор габарита ячейки по ширине (см)"
+        verbose_name="Высота ячейки, см",
+        help_text="Выбор габарита ячейки по высоте (см)"
     )
     slot_status = models.CharField(
         max_length=10,
@@ -93,13 +93,14 @@ class Slot(models.Model):
     class Meta:
         verbose_name = "Ячейка"
         verbose_name_plural = "Ячейки"
+        ordering = ('slot_number',)
         constraints = [
             models.CheckConstraint(
                 condition=(
                     models.Q(controller__isnull=True,
-                             controller_channel_num__is_nul=True)
+                             controller_channel_num__isnull=True)
                     | models.Q(controller__isnull=False,
-                               controller_channel_num__is_nul=False)
+                               controller_channel_num__isnul=False)
                 ),
                 name='slot_pair_cntrl_consistent'
             ),
