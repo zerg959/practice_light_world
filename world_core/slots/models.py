@@ -1,5 +1,4 @@
 from django.db import models
-from stations import Station, Controller
 from django.core.validators import (MinValueValidator, MaxValueValidator)
 
 
@@ -9,7 +8,7 @@ class Slot(models.Model):
     Единица хранения арендуемых предметов.
     Одна Ячейка в моменте может быть связана только с одним Предметом.
     Одна Ячейка управляется одним Каналом Контроллера.
-    Уникальность связи реализована в Meta.constraints модели. 
+    Уникальность связи реализована в Meta.constraints модели.
     ВАЖНО:
     Прямая привязка Ячейка - Станция в модели отсутствует.
     Станция и Ячейка связаны только через модель Контроллер.
@@ -58,7 +57,7 @@ class Slot(models.Model):
         default=None,
         verbose_name="Высота ячейки, см",
         help_text="Выбор габарита ячейки по высоте (см)"
-    ) 
+    )
     height = models.CharField(
         max_length=3,
         choices=SlotHeight.choices,
@@ -84,7 +83,7 @@ class Slot(models.Model):
         verbose_name="Контроллер станции",
         help_text="Контроллер станции, в которой расположена ячейка"
         )
-    controller_chanell_num = models.PositiveSmallIntegerField(
+    controller_channel_num = models.PositiveSmallIntegerField(
         max_length=2,
         null=True,
         blank=True,
@@ -101,7 +100,7 @@ class Slot(models.Model):
         verbose_name_plural = "Ячейки"
         constraints = [
             models.UniqueConstraint(
-                fields=['controller', 'channel'],
+                fields=['controller', 'controller_channel_num'],
                 name="unique_cntrl_chnl_per_slot")
                 ]
 
