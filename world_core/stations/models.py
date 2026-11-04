@@ -12,7 +12,8 @@ class Station(models.Model):
         OFFLINE = ('offline', 'Офлайн')
     location = models.CharField() # заменить на координаты?
     current_applied_config_version = models.ForeignKey(
-        'stations.StationConfig'
+        'stations.StationConfig',
+        
     )
     station_status = models.CharField(
         max_length=6,
