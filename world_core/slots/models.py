@@ -105,6 +105,8 @@ class Slot(models.Model):
             ),
             models.UniqueConstraint(
                 fields=['controller', 'controller_channel_num'],
+                condition=models.Q(controller__isnull=False,
+                                   controller_channel_num__isnull=False),
                 name="unique_cntrl_chnl_per_slot")
                 ]
 
