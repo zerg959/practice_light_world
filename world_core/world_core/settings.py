@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -145,3 +146,16 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Rental Station Admin",
+    "site_header": "Rental Station",
+    "site_brand": "Станция аренды оборудования",
+    "welcome_sign": "Панель управления",
+    "copyright": "Light World",
+    "ui_theme_enabled": True,
+    "changeform_format": "collapsible", 
+}
+
+JAZZMIN_SETTINGS["show_sidebar"] = True
+JAZZMIN_SETTINGS["navigation_expanded"] = True
