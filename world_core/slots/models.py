@@ -100,7 +100,7 @@ class Slot(models.Model):
                     models.Q(controller__isnull=True,
                              controller_channel_num__isnull=True)
                     | models.Q(controller__isnull=False,
-                               controller_channel_num__isnul=False)
+                               controller_channel_num__isnull=False)
                 ),
                 name='slot_pair_cntrl_consistent'
             ),
