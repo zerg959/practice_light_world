@@ -3,25 +3,27 @@ from django.core.validators import (MinValueValidator, MaxValueValidator)
 from django.db.models import Q
 import uuid
 
-    class CommandType(models.TextChoices):
-        """
-        Типы команды.
-        """
-        OPEN_LOCK = ("open_lock", "Открыть замок")
-        GET_STATUS = ("get_status", "Получить статус")
-        REBOOT = ("reboot", "Перезагрузить")
-        PING = ("ping", "Установить связь")
 
-    class CommandStatus(models.TextChoices):
-        """
-        Статусы команды.
-        """
-        PENDING = ("pending", "Ожидание")
-        SENT = ("sent", "Отправлено")
-        ACKED = ("acked", "Подтверждено")
-        FAILED = ("failed", "Неудачно")
-        TIMEOUT = ("timeout", "Таймаут")
-        CANCELLED = ("cancelled", "Отменено")
+class CommandType(models.TextChoices):
+    """
+    Типы команды.
+    """
+    OPEN_LOCK = ("open_lock", "Открыть замок")
+    GET_STATUS = ("get_status", "Получить статус")
+    REBOOT = ("reboot", "Перезагрузить")
+    PING = ("ping", "Установить связь")
+
+
+class CommandStatus(models.TextChoices):
+    """
+    Статусы команды.
+    """
+    PENDING = ("pending", "Ожидание")
+    SENT = ("sent", "Отправлено")
+    ACKED = ("acked", "Подтверждено")
+    FAILED = ("failed", "Неудачно")
+    TIMEOUT = ("timeout", "Таймаут")
+    CANCELLED = ("cancelled", "Отменено")
 
 
 class HardwareCommand(models.Model):
