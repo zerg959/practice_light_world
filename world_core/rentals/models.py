@@ -115,6 +115,7 @@ class Rental(models.Model):
     rental_status = models.CharField(
         max_length=20,
         choices=RentalStatus.choices,
+        default=RentalStatus.STARTED,
         verbose_name="Состояние аренды",
         help_text="Текущее состояние аренды"
     )
@@ -147,8 +148,10 @@ class Rental(models.Model):
                     models.Q(rental_status=RentalStatus.STARTED)
                     & models.Q(finish_slot__isnull=True, finish_station__isnull=True)
                 )
-                | ~models.Q(rental_status=RentalStatus.STARTED)
-                & models.Q(finish_slot__isnull=False, finish_station__isnull=False),
+                | (
+                    ~models.Q(rental_status=RentalStatus.STARTED)
+                & models.Q(finish_slot__isnull=False, finish_station__isnull=False)
+                ),
                 name='rental_status_finish_chk',
             ),
             
