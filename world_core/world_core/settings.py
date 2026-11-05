@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     "items",
     "tariffs",
     "rentals",
-    "hardware"
+    "hardware",
+    "tests",
 ]
 AUTH_USER_MODEL = 'users.User'
 
