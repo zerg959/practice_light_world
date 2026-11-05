@@ -37,6 +37,7 @@ class HardwareCommand(models.Model):
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
+        verbose_name="UUID",
         help_text="Уникальный идентификатор команды (UUID4)"
     )
 
@@ -44,7 +45,8 @@ class HardwareCommand(models.Model):
         "stations.Controller",
         on_delete=models.CASCADE,
         related_name="commands",
-        help_text="Контроллер",
+        verbose_name="Контроллер",
+        help_text="Управляющий контроллер",
         )
 
     channel = models.IntegerField(
@@ -52,6 +54,7 @@ class HardwareCommand(models.Model):
             MinValueValidator(1, message='Номер канала не может быть меньше 1'),
             MaxValueValidator(16, message='Номер канала не может быть больше 16')
             ],
+        verbose_name="Канал",    
         help_text="Номер канала (1-16)."
         "На один канал одного контроллера может быть только одна "
         "активная команда (со статусом pending или sent). Повторная "
@@ -62,6 +65,7 @@ class HardwareCommand(models.Model):
         max_length=15,
         choices=CommandType.choices,
         default=CommandType.GET_STATUS,
+        verbose_name="Тип комнады",
         help_text=(
             "Тип команды. "
             "Комбинация (controller, channel, command_type) "
@@ -73,14 +77,26 @@ class HardwareCommand(models.Model):
         max_length=30,
         choices=Status.choices,
         default=Status.PENDING,
+        verbose_name="Статус",
         help_text="Текущий статус команды"
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
+        verbose_name="Создан",
         help_text="Время создания"
         )
-    # sent_at = models.DateTimeField()
-    # finished_at = models.DateTimeField()
+    sent_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name="Отправлена",
+        help_text="Время отправки команды"
+    )
+    finished_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name="Завершена",
+        help_text="Время завершения команды"
+    )
 
     class Meta:
         indexes = [
@@ -95,7 +111,7 @@ class HardwareCommand(models.Model):
             models.UniqueConstraint(
                 fields=['controller', 'channel', 'command_type'],
                 condition=Q(status__in=[Status.SENT, Status.PENDING]),
-                name='unique_active_command_per_channel')
+                name='uniq_active_cmd_per_channel')
             ]
 
     def __str__(self):
@@ -123,6 +139,9 @@ class SensorEvent(models.Model):
         ERROR = ('error', 'Ошибка')
 
     class ProcessStatus(models.TextChoices):
+        """
+        Статусы процесса.
+        """
         PENDING = ('pending', 'Ожидает обработки')
         DONE = ('done', 'Обработано')
         FAILED = ('failed', 'Ошибка обработки')
@@ -131,13 +150,15 @@ class SensorEvent(models.Model):
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
+        verbose_name="UUID",
         help_text="Уникальный идентификатор события (UUID4)"
     )
     controller = models.ForeignKey(
         'stations.Controller',
         on_delete=models.PROTECT,
         related_name="events",
-        help_text="Контроллер"
+        verbose_name="Контроллер",
+        help_text="Контроллер, управляющий событием"
         )
     channel = models.IntegerField(
         validators=[
@@ -146,16 +167,19 @@ class SensorEvent(models.Model):
             ],
         null=True,
         blank=True,
-        help_text="Номер канала"
+        verbose_name="Номер канала",
+        help_text="Номер канала контроллера (1-16), через который осуществляется управление"
         )
     event_type = models.CharField(
         max_length=30,
         choices=EventType.choices,
+        verbose_name="Тип события",
         help_text="Тип события"
     )
     raw_data = models.JSONField(
         default=dict,
         blank=True,
+        verbose_name="Raw data",
         help_text=(
             "Первичные данные от контроллера (JSON). "
             "Содержит все сырые поля, включая внутренний ID события, "
@@ -165,27 +189,32 @@ class SensorEvent(models.Model):
     )
     received_at = models.DateTimeField(
         auto_now_add=True,
+        verbose_name="Время создания",
         help_text="Серверное время события"
         )
     processing_status = models.CharField(
         max_length=20,
         choices=ProcessStatus.choices,
         default=ProcessStatus.PENDING,
+        verbose_name="Статус",
         help_text="Статус обработки события"
     )
     processed_at = models.DateTimeField(
         null=True,
         blank=True,
+        verbose_name="Время завершения",
         help_text="Время завершения обработки"
     )
     processing_error = models.CharField(
         max_length=1000,
         null=True,
         blank=True,
+        verbose_name="Ошибки",
         help_text="Поле для записи ошибок внешнего элемента"
         )
     attempts = models.PositiveSmallIntegerField(
         default=0,
+        verbose_name="Повторные попытки",
         help_text="Количество попыток обработки"
     )
 
