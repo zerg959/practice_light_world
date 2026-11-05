@@ -2,6 +2,31 @@ from django.db import models
 from django.core.validators import (MinValueValidator, MaxValueValidator)
 
 
+class SlotStatus(models.TextChoices):
+    """
+    Возможные статусы Ячейки.
+    """
+    EMPTY = ('empty', 'Свободна')
+    BUSY = ('busy', 'Занята')
+
+class SlotWidth(models.IntegerChoices):
+    """
+    Ширина Ячейки: возможные габариты.
+    """
+    w_XSMALL = 10, "10 см"
+    w_SMALL = 20, "20 см"
+    w_MEDIUM = 40, "40 см"
+    w_LARGE = 100, "100 см"
+
+class SlotHeight(models.IntegerChoices):
+    """
+    Высота Ячейки: возможные габариты.
+    """
+    h_SMALL = 30, "30 см"
+    h_MEDIUM = 40, "40 см"
+    h_LARGE = 60, "60 см"
+
+
 class Slot(models.Model):
     '''
     Модель Ячейка.
@@ -14,29 +39,6 @@ class Slot(models.Model):
     Прямая привязка Ячейка - Станция в модели отсутствует.
     Станция и Ячейка связаны только через модель Контроллер.
     '''
-    class Status(models.TextChoices):
-        """
-        Возможные статусы Ячейки.
-        """
-        EMPTY = ('empty', 'Свободна')
-        BUSY = ('busy', 'Занята')
-
-    class SlotWidth(models.IntegerChoices):
-        """
-        Ширина Ячейки: возможные габариты.
-        """
-        w_XSMALL = 10, "10 см"
-        w_SMALL = 20, "20 см"
-        w_MEDIUM = 40, "40 см"
-        w_LARGE = 100, "100 см"
-
-    class SlotHeight(models.IntegerChoices):
-        """
-        Высота Ячейки: возможные габариты.
-        """
-        h_SMALL = 30, "30 см"
-        h_MEDIUM = 40, "40 см"
-        h_LARGE = 60, "60 см"
 
     slot_number = models.PositiveSmallIntegerField(
         null=True,
@@ -65,8 +67,8 @@ class Slot(models.Model):
     )
     slot_status = models.CharField(
         max_length=10,
-        choices=Status.choices,
-        default=Status.EMPTY,
+        choices=SlotStatus.choices,
+        default=SlotStatus.EMPTY,
         verbose_name="Статус ячейки",
         help_text="Актуальный статус ячейки"
         )

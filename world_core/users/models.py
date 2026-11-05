@@ -2,16 +2,20 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class Role(models.TextChoices):
+    """
+    Роли пользователей.
+    """
+    USER = 'user', 'Пользователь'
+    ADMIN = 'admin', 'Администратор'
+
+
 class User(AbstractUser):
     """
     Модель Пользователь.
     Базовые поля (username, пароль, email, сессии, права)
     наследуются от AbstractUser.
     """
-
-    class Role(models.TextChoices):
-        USER = 'user', 'Пользователь'
-        ADMIN = 'admin', 'Администратор'
 
     role = models.CharField(
         max_length=10,

@@ -4,6 +4,16 @@ from decimal import Decimal
 import uuid
 
 
+
+class TariffUnit(models.TextChoices):
+    """
+    Возможные единицы Тарификации.
+    """
+    HOUR = ('hour', 'Час')
+    DAY = ('day', 'Сутки')
+    MONTH = ('month', 'Месяц')
+
+
 class Tariff(models.Model):
     """
     Модель Тариф.
@@ -15,11 +25,6 @@ class Tariff(models.Model):
     1.Версия уникальна внутри единицы
     2.На каждую единицу — только один действующий тариф
     """
-
-    class TariffUnit(models.TextChoices):
-        HOUR = ('hour', 'Час')
-        DAY = ('day', 'Сутки')
-        MONTH = ('month', 'Месяц')
 
     id = models.UUIDField(
         primary_key=True,

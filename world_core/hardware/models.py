@@ -3,16 +3,6 @@ from django.core.validators import (MinValueValidator, MaxValueValidator)
 from django.db.models import Q
 import uuid
 
-
-class HardwareCommand(models.Model):
-    """
-    Модель описывает очередь исходящих команд.
-    Слой коммуникации для реализации физических действий через Контроллер.
-    Позволяет ставить команды в очередь, отслеживать статусы
-    (pending → sent → acked/failed/timeout) и отменять ещё не отправленные.
-    Например: Открыть или закрыть ячейку.
-    """
-
     class CommandType(models.TextChoices):
         """
         Типы команды.
@@ -22,7 +12,7 @@ class HardwareCommand(models.Model):
         REBOOT = ("reboot", "Перезагрузить")
         PING = ("ping", "Установить связь")
 
-    class Status(models.TextChoices):
+    class CommandStatus(models.TextChoices):
         """
         Статусы команды.
         """
@@ -33,6 +23,15 @@ class HardwareCommand(models.Model):
         TIMEOUT = ("timeout", "Таймаут")
         CANCELLED = ("cancelled", "Отменено")
 
+
+class HardwareCommand(models.Model):
+    """
+    Модель описывает очередь исходящих команд.
+    Слой коммуникации для реализации физических действий через Контроллер.
+    Позволяет ставить команды в очередь, отслеживать статусы
+    (pending → sent → acked/failed/timeout) и отменять ещё не отправленные.
+    Например: Открыть или закрыть ячейку.
+    """
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -75,8 +74,8 @@ class HardwareCommand(models.Model):
     )
     status = models.CharField(
         max_length=30,
-        choices=Status.choices,
-        default=Status.PENDING,
+        choices=CommandStatus.choices,
+        default=CommandStatus.PENDING,
         verbose_name="Статус",
         help_text="Текущий статус команды"
     )
@@ -110,7 +109,7 @@ class HardwareCommand(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['controller', 'channel', 'command_type'],
-                condition=Q(status__in=[Status.SENT, Status.PENDING]),
+                condition=Q(status__in=[CommandStatus.SENT, CommandStatus.PENDING]),
                 name='uniq_active_cmd_per_channel')
             ]
 
@@ -129,22 +128,6 @@ class SensorEvent(models.Model):
     ретрай-воркер берёт всё с processing_status=FAILED (и, если нужно, attempts < N
     (для ограничения попыток)).
     """
-    class EventType(models.TextChoices):
-        """
-        Типы событий от Контроллера.
-        """
-        DOOR_OPEN = ('door_open', 'Дверь открыта')
-        DOOR_CLOSE = ('door_close', 'Дверь закрыта')
-        REBOOT = ('reboot', 'Перезагрузка')
-        ERROR = ('error', 'Ошибка')
-
-    class ProcessStatus(models.TextChoices):
-        """
-        Статусы процесса.
-        """
-        PENDING = ('pending', 'Ожидает обработки')
-        DONE = ('done', 'Обработано')
-        FAILED = ('failed', 'Ошибка обработки')
 
     id = models.UUIDField(
         primary_key=True,

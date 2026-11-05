@@ -2,19 +2,39 @@ from django.db import models
 from django.conf import settings
 import uuid
 
+
+class StationStatus(models.TextChoices):
+    """
+    Возможные статусы станции.
+    """
+    ONLINE = ('online', 'Онлайн')
+    OFFLINE = ('offline', 'Офлайн')
+
+
+class ConfigStatus(models.TextChoices): 
+    """
+    Возможные статусы Конфигурации.
+    """
+    PUBLISHED = ('published', 'Опубликовано') 
+    APPLIED = ('applied', 'Применено')
+    DEPRECATED = ('deprecated', 'Устарело')
+
+
+class ControllerStatus(models.TextChoices):
+    """
+    Возмодные статусы Контроллера.
+    """
+    ONLINE = ('online', 'Онлайн')
+    OFFLINE = ('offline', 'Офлайн')
+    ERROR = ('error', 'Ошибка')
+
+
 class Station(models.Model):
     """
     Модель Станция.
     Содержит слоты для хранения объектов выдачи.
     Содержит примененную Конфигурацию Станиции
     """
-
-    class Status(models.TextChoices):
-        """
-        Возможные статусы станции.
-        """
-        ONLINE = ('online', 'Онлайн')
-        OFFLINE = ('offline', 'Офлайн')
 
     location = models.CharField(
         max_length=200,
@@ -33,8 +53,8 @@ class Station(models.Model):
        )
     station_status = models.CharField(
         max_length=20,
-        choices=Status.choices,
-        default=Status.OFFLINE,
+        choices=StationStatus.choices,
+        default=StationStatus.OFFLINE,
         verbose_name='Статус станции',
         help_text="например: Онлайн/Офлайн"
     )
@@ -55,13 +75,7 @@ class StationConfig(models.Model):
     Используемые (applied) версии записываются в БД и применяются в поле
     current_applied_config.
     '''
-    class Status(models.TextChoices): 
-        """
-        Возможные статусы Конфигурации.
-        """
-        PUBLISHED = ('published', 'Опубликовано') 
-        APPLIED = ('applied', 'Применено')
-        DEPRECATED = ('deprecated', 'Устарело')
+
     station = models.ForeignKey(
         'stations.Station',
         on_delete=models.CASCADE,
@@ -79,8 +93,8 @@ class StationConfig(models.Model):
     )
 
     status = models.CharField(
-        choices=Status.choices,
-        default=Status.PUBLISHED,
+        choices=ConfigStatus.choices,
+        default=ConfigStatus.PUBLISHED,
         max_length=20,
         verbose_name="Статус конфигурации",
         help_text="Текущий статус конфигурации: Опубликовано/Применено/Устарело"
@@ -122,7 +136,7 @@ class StationConfig(models.Model):
                 fields=['station', 'version_number'],
                 name="uniq_vers_per_stat"),
             models.UniqueConstraint(
-                fields=['station'], condition=models.Q(status=Status.APPLIED),
+                fields=['station'], condition=models.Q(status=ConfigStatus.APPLIED),
                 name="uniq_applied_vers_per_stat")
                 ]
 
@@ -140,10 +154,6 @@ class Controller(models.Model):
     Статусы и время последнего отклика обновляет воркер,
     обрабатывающий SensorEvent (heartbeat / PING-ответы).
     """
-    class Status(models.TextChoices):
-        ONLINE = ('online', 'Онлайн')
-        OFFLINE = ('offline', 'Офлайн')
-        ERROR = ('error', 'Ошибка')
 
     id = models.UUIDField(
         primary_key=True,
@@ -175,8 +185,8 @@ class Controller(models.Model):
         )
     status = models.CharField(
         max_length=10,
-        choices=Status.choices,
-        default=Status.OFFLINE,
+        choices=ControllerStatus.choices,
+        default=ControllerStatus.OFFLINE,
         verbose_name="Статус контроллера",
         help_text="Актуальный статус связи: онлайн/офлайн/ошибка",
     )

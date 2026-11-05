@@ -5,12 +5,33 @@ import uuid
 from django.conf import settings
 
 
+class RentalUnit(models.TextChoices):
+    """
+    Доступные единицы аренды.
+    """
+    HOUR = ('hour', 'Час')
+    DAY = ('day', 'Сутки')
+    MONTH = ('month', 'Месяц')
+
+class RentalStatus(models.TextChoices):
+    """
+    Доступные статусы аренды.
+    """
+    FINISHED = ('finished', 'Завершена')
+    STARTED = ('started', 'Начата')
+    CANCELLED = ('cancelled', 'Отменена') 
+
+
+class EventType(models.TextChoices):
+    STARTED = ('started', 'Старт')
+    FINISHED = ('finished', 'Завершение')
+    CANCELLED = ('cancelled', 'Отмена')
+
+
 class Rental(models.Model):
     '''
     Модель для создания объекта Аренды.
-
-
-    В Meta ключевые Constrints:
+    В Meta ключевые Constraints:
     Constraint 1:
     Cогласованность пары возврата:
     (return_slot пусто И return_station пусто)
@@ -21,23 +42,7 @@ class Rental(models.Model):
     статус «активна»  → return_slot и return_station пусты
     статус «завершена»/«отменена» → пара возврата заполнена
 
-    '''
-    class RentalUnit(models.TextChoices):
-        """
-        Доступные единицы аренды.
-        """
-        HOUR = ('hour', 'Час')
-        DAY = ('day', 'Сутки')
-        MONTH = ('month', 'Месяц')
-
-    class RentalStatus(models.TextChoices):
-        """
-        Доступные статусы аренды.
-        """
-        FINISHED = ('finished', 'Завершена')
-        STARTED = ('started', 'Начата')
-        CANCELLED = ('cancelled', 'Отменена') 
-    
+    ''' 
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -181,11 +186,6 @@ class RentalEvent(models.Model):
     Каждое событие фиксирует факт и цифры на момент его совершения.
     Записи не редактируются и не удаляются.
     """
-
-    class EventType(models.TextChoices):
-        STARTED = ('started', 'Старт')
-        FINISHED = ('finished', 'Завершение')
-        CANCELLED = ('cancelled', 'Отмена')
 
     id = models.UUIDField(
         primary_key=True,

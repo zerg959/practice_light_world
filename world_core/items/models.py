@@ -2,6 +2,16 @@ from django.db import models
 import uuid
 
 
+class ItemStatus(models.TextChoices):
+    """
+    Статусы предмета.
+    """
+    AVAILABLE = ('available', 'Доступен')
+    RENTED = ('rented', 'В аренде')
+    MAINTENANCE = ('maintenance', 'На обслуживании')
+    RETIRED = ('retired', 'Списан')
+
+
 class Item(models.Model):
     '''
     Модель Предмет.
@@ -11,14 +21,6 @@ class Item(models.Model):
     Один Предмет может находиться только в одной Ячейке.
     Один Предмет в единицу времени может взять только один Пользователь.
     '''
-    class Status(models.TextChoices):
-        """
-        Статусы предмета.
-        """
-        AVAILABLE = ('available', 'Доступен')
-        RENTED = ('rented', 'В аренде')
-        MAINTENANCE = ('maintenance', 'На обслуживании')
-        RETIRED = ('retired', 'Списан')
 
     id = models.UUIDField(
         primary_key=True,
@@ -88,7 +90,7 @@ class Item(models.Model):
     )
     status = models.CharField(
         max_length=20,
-        choices=Status.choices,
+        choices=ItemStatus.choices,
         verbose_name="Статус",
         help_text="Текущий статус предмета",
     )
