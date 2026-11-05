@@ -35,6 +35,16 @@ class EventType(models.TextChoices):
     REBOOT = ('reboot', 'Перезагрузка')
     ERROR = ('error', 'Ошибка')
 
+
+class ProcessStatus(models.TextChoices):
+    """
+    Статусы процесса.
+    """
+    PENDING = ('pending', 'Ожидает обработки')
+    DONE = ('done', 'Обработано')
+    FAILED = ('failed', 'Ошибка обработки')
+
+
 class HardwareCommand(models.Model):
     """
     Модель описывает очередь исходящих команд.
