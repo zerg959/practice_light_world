@@ -26,6 +26,15 @@ class CommandStatus(models.TextChoices):
     CANCELLED = ("cancelled", "Отменено")
 
 
+class EventType(models.TextChoices):
+    """
+    Типы событий от Контроллера.
+    """
+    DOOR_OPEN = ('door_open', 'Дверь открыта')
+    DOOR_CLOSE = ('door_close', 'Дверь закрыта')
+    REBOOT = ('reboot', 'Перезагрузка')
+    ERROR = ('error', 'Ошибка')
+
 class HardwareCommand(models.Model):
     """
     Модель описывает очередь исходящих команд.
