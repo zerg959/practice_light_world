@@ -18,6 +18,7 @@ Pillow>=11.0              # ImageField
 django-cors-headers>=4.7  # CORS for React (browser)
 drf-spectacular>=0.28     # OpenAPI / Swagger
 django-filter>=25.1
+django-extensions
 
 # ============================================================
 # Django Admin & Utils
