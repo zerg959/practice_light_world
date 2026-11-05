@@ -1,10 +1,16 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
 from .models import User
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('username',)
-    search_fields = ('username',)
-    ordering = ('username',)
-
+class CustomUserAdmin(UserAdmin):
+    list_display = ("username", "role", "is_staff", "date_joined")
+    list_filter = ("role", "is_staff")
+    fieldsets = UserAdmin.fieldsets + (
+        ("Дополнительно", {"fields": ("role",)}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ("Дополнительно", {"fields": ("role",)}),
+    )
