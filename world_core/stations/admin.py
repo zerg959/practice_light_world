@@ -13,7 +13,7 @@ class StationConfigInline(admin.TabularInline):
     model = StationConfig
     extra = 0
     readonly_fields = ("created_at",)
-    fields = ("version_number", "status", "snapshot", "created_at")
+    fields = ("station","version_number", "status", "snapshot", "created_at")
 
 
 @admin.register(Station)

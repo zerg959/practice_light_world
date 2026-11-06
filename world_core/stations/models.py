@@ -47,6 +47,7 @@ class Station(models.Model):
        'stations.StationConfig',
        on_delete=models.PROTECT,  # конфиг не удалить. если он используется
        null=True,
+       blank=True,
        related_name="stations_with_curr_conf",
        verbose_name="Текущая примененная версия конфигурации",
        help_text="Активная версия конфигурации"
@@ -81,6 +82,7 @@ class StationConfig(models.Model):
         on_delete=models.CASCADE,
         related_name="configs",
         blank=True,
+        null=True,
         verbose_name="Станция",
         help_text="Станция, где применена конфигурация"
     )
