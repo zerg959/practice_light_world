@@ -34,6 +34,10 @@ class Station(models.Model):
     Модель Станция.
     Содержит слоты для хранения объектов выдачи.
     Содержит примененную Конфигурацию Станиции
+
+    TODO: циклическая связь со StationConfig обойдена через null=True/blank=True.
+    Обсудить: убрать обратную ссылку из Station
+    (FK достаточно в одной стороне), снять nullable, реализовать в clean().
     """
 
     location = models.CharField(
