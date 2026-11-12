@@ -10,6 +10,10 @@ class TestUserModel:
         """Созданный пользователь получает статус 'user'."""
         assert user.role == Role.USER
 
+    def test_create_admin(self, admin):
+        """Созданный админ получает статус 'admin'."""
+        assert admin.role == Role.ADMIN
+
 
     def test_user_saved_to_db(self, user, fake):
         """Созданный пользователь доступен в базе по имени."""
