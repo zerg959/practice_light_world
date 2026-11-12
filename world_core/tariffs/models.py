@@ -4,7 +4,6 @@ from decimal import Decimal
 import uuid
 
 
-
 class TariffUnit(models.TextChoices):
     """
     Возможные единицы Тарификации.

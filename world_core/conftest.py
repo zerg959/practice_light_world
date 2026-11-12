@@ -74,9 +74,20 @@ def controller(fake, station):
     Контроллер - фикстура
     """
     controller = Controller.objects.create(
-        name = fake.bothify(text="CTRL-##-??"),
-        serial_number = fake.uuid4(),
+        name=fake.bothify(text="CTRL-##-??"),
+        serial_number=fake.uuid4(),
         station=station,
         status=ControllerStatus.OFFLINE
     )
     return controller
+
+@pytest.fixture
+def tariff(fake):
+    """
+    Тариф - фикстура
+    """
+    tariff = Tariff.objects.create(
+        unit=TariffUnit.HOUR,
+        price_per_unit=1.00,
+        ve
+    )
