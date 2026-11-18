@@ -1,0 +1,16 @@
+import pytest
+from slots.models import Slot, SlotHeight, SlotStatus, SlotWidth
+
+@pytest.mark.django_db
+class TestSlotModel:
+    """
+    Юнит-тесты класса Ячейка (Slot)
+    """
+    def test_slot_created_in_db(self, slot):
+        found = Slot.objects.filter(id=slot.id).first()
+        assert found is not None
+        assert found.id == slot.id
+        assert found.slot_status == SlotStatus.EMPTY
+
+    def test_slot_num_in_corr_range(self):
+        

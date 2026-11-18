@@ -79,7 +79,7 @@ def controller(fake, station):
     return controller
 
 @pytest.fixture
-def active_tariff(fake):
+def active_tariff():
     """
     Активный Тариф - фикстура
     """
@@ -91,7 +91,7 @@ def active_tariff(fake):
     return active_tariff
 
 @pytest.fixture
-def inactive_tariff(fake):
+def inactive_tariff():
     """
     Наактивный Тариф - фикстура
     """
@@ -102,3 +102,22 @@ def inactive_tariff(fake):
         is_active=False
     )
     return inactive_tariff
+
+@pytest.fixture
+def slot():
+    """
+    Ячейка - фикстура Slot
+    """
+    return Slot.objects.create()
+
+@pytest.fixture
+def connected_slot(controller):
+    """
+    Ячейка с активным Контроллером
+    """
+    conn_slot = Slot.objects.create(
+        controller=controller,
+        controller_channel_num=1,
+        slot_number=1
+    )
+    return conn_slot
