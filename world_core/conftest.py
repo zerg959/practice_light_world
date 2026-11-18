@@ -57,16 +57,13 @@ def station(fake):
 
 
 @pytest.fixture
-def station_config(station, admin):
+def station_config():
     """
     Конфиг Станции - фикстура.
     """
-    station_config = StationConfig.objects.create(
-        version_number=5,
-        station=station,
-        created_by=admin
+    return StationConfig.objects.create(
+        version_number=Decimal("1"),
     )
-    return  station_config
 
 @pytest.fixture
 def controller(fake, station):

@@ -1,11 +1,15 @@
 import pytest
-from stations.models import Station, StationConfig, Controller
+from django.db import IntegrityError
+from stations.models import (
+    Station, StationConfig, Controller, 
+    StationStatus, ConfigStatus, ControllerStatus
+    )
 
 
 @pytest.mark.django_db
 class TestStationModel:
     """
-    Юнит-тесты модели Statiion (Станция).
+    Юнит-тесты модели Station (Станция).
     """
     def test_station_created(self, station):
         """
@@ -16,3 +20,42 @@ class TestStationModel:
         found = Station.objects.filter(id=station.id).first()
         assert found is not None
         assert found.location == station.location
+
+    def test_correct_default_station_status(self, station):
+        """Станция содержит корректный дефолтный статус"""
+        assert station.station_status == StationStatus.OFFLINE
+
+
+@pytest.mark.django_db
+class TestStationConfigModel:
+    """
+    Юнит-тесты модели Конфигурация Станции (StationConfig)
+    """
+    def test_config_created_in_db(self, station_config):
+        found = StationConfig.objects.filter(id=station_config.id).first()
+        assert found is not None
+        assert found.id == station_config.id
+        assert found.version_number == station_config.version_number
+        assert found.status == ConfigStatus.PUBLISHED
+        assert found.snapshot == {}
+
+@pytest.mark.django_db
+class TestControllerModel:
+    """
+    Юнит-тесты класса Контроллер (Controller)
+    """
+    def test_controller_created_id_db(self, controller):
+        found = Controller.objects.filter(pk=controller.pk).first()
+        assert found is not None
+        assert found.id == controller.id
+        assert found.station_id == controller.station.id
+        assert found.name == controller.name
+        assert found.serial_number == controller.serial_number
+        assert found.status == ControllerStatus.OFFLINE
+
+    def test_controller_serial_num_is_unique(self, station, controller):
+        with pytest.raises(IntegrityError):
+            Controller.objects.create(
+                station=station,
+                serial_number=controller.serial_number
+            )
