@@ -2,7 +2,7 @@
 import pytest
 from faker import Faker
 from pytest_mock import MockerFixture
-
+from decimal import Decimal
 
 from users.models import User, Role
 from hardware.models import HardwareCommand, CommandStatus, CommandType, SensorEvent, ProcessStatus
@@ -82,12 +82,26 @@ def controller(fake, station):
     return controller
 
 @pytest.fixture
-def tariff(fake):
+def active_tariff(fake):
     """
-    Тариф - фикстура
+    Активный Тариф - фикстура
     """
-    tariff = Tariff.objects.create(
+    active_tariff = Tariff.objects.create(
         unit=TariffUnit.HOUR,
-        price_per_unit=1.00,
-        ve
+        price_per_unit=Decimal("1.00"),
+        version="2026-beta"
     )
+    return active_tariff
+
+@pytest.fixture
+def inactive_tariff(fake):
+    """
+    Наактивный Тариф - фикстура
+    """
+    inactive_tariff = Tariff.objects.create(
+        unit=TariffUnit.HOUR,
+        price_per_unit=Decimal("1.50"),
+        version="2025-old",
+        is_active=False
+    )
+    return inactive_tariff
