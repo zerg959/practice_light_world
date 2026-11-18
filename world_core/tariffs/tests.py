@@ -1,3 +1,5 @@
-from django.test import TestCase
+import pytest
+from tariffs.models import Tariff, TariffUnit
 
-# Create your tests here.
+@pytest.mark.django_db
+def test_tariff_created_in_db(self)
