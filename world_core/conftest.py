@@ -104,11 +104,23 @@ def inactive_tariff():
     return inactive_tariff
 
 @pytest.fixture
-def slot():
+def empty_slot():
     """
-    Ячейка - фикстура Slot
+    Ячейка пустая - фикстура Slot
     """
-    return Slot.objects.create()
+    return Slot.objects.create(
+        slot_status=SlotStatus.EMPTY,
+    )
+
+@pytest.fixture
+def busy_slot():
+    """
+    Ячейка занятая - фикстура Slot
+    """
+    return Slot.objects.create(
+        slot_status=SlotStatus.BUSY,
+    )
+
 
 @pytest.fixture
 def connected_slot(controller):
@@ -121,3 +133,28 @@ def connected_slot(controller):
         slot_number=1
     )
     return conn_slot
+
+@pytest.fixture
+def available_item(fake):
+    """
+    доступный Предмет аренды - фикстура Item
+    """
+    available_item = Item.objects.create(
+        name = "Hack Wrench/ Ключ разводной",
+        description = fake.sentence(),
+        status = ItemStatus.AVAILABLE
+        )
+    return available_item
+
+
+@pytest.fixture
+def rented_item(fake):
+    """
+    арендованный Предмет аренды - фикстура Item
+    """
+    rented_item = Item.objects.create(
+    name = "Screwdriver/ Отвёртка",
+    description = fake.sentence(),
+    status = ItemStatus.RENTED
+    )
+    return rented_item

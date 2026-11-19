@@ -13,4 +13,7 @@ class TestSlotModel:
         assert found.slot_status == SlotStatus.EMPTY
 
     def test_slot_num_in_corr_range(self):
-        
+        pass
+
+    def test_channel_num_in_corr_range(self):
+        pass
