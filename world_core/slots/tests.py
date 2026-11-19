@@ -6,10 +6,10 @@ class TestSlotModel:
     """
     Юнит-тесты класса Ячейка (Slot)
     """
-    def test_slot_created_in_db(self, slot):
-        found = Slot.objects.filter(id=slot.id).first()
+    def test_slot_created_in_db(self, empty_slot):
+        found = Slot.objects.filter(id=empty_slot.id).first()
         assert found is not None
-        assert found.id == slot.id
+        assert found.id == empty_slot.id
         assert found.slot_status == SlotStatus.EMPTY
 
     def test_slot_num_in_corr_range(self):
