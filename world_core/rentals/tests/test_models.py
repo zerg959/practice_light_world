@@ -10,7 +10,7 @@ class TestRentalModel:
     """
     def test_rental_created_in_db_in_started_status(self, started_rental):
         """
-        Проверяем, что Аренда создается в БД с коректным статусом
+        Проверяем, что Аренда создается в БД с корректным статусом
         """
         found = Rental.objects.filter(id=started_rental.id).first()
         assert found is not None
