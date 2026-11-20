@@ -201,7 +201,7 @@ class RentalEvent(models.Model):
         verbose_name="Аренда",
         help_text="Аренда, к которой относится событие",
     )
-    type = models.CharField(
+    event_type = models.CharField(
         max_length=20,
         choices=EventType.choices,
         verbose_name="Тип события",
@@ -256,20 +256,21 @@ class RentalEvent(models.Model):
 
     @classmethod
     def log(cls, *, rental, event_type, started_at, finished_at=None,
-            total_amount=None, created_by=None):
+            total_amount=None, created_by=None, created_at=None):
         """
         Единственная точка создания событий.
         Снапшоты цифры берёт сам — из Rental, в момент вызова.
         """
         return cls.objects.create(
             rental=rental,
-            type=event_type,
+            event_type=event_type,
             started_at=started_at,
             finished_at=finished_at,
             price_per_unit=rental.price_per_unit,   # копия значения из Rental
             unit=rental.rental_unit,                # копия значения из Rental
             total_amount=total_amount,
             created_by=created_by,
+            created_at=created_at
         )
 
     class Meta:
