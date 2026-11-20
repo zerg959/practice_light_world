@@ -1,17 +1,10 @@
 import pytest
-from django.utils import timezone
-from datetime import timedelta
+from .constants import RENTAL_FINISH, RENTAL_HOURS, RENTAL_START
 from rentals.models import (
     Rental, RentalEvent, EventType, 
     RentalStatus
     )
 
-
-RENTAL_START = timezone.make_aware(
-    timezone.datetime(2026, 10, 15, 10, 0, 0)
-)
-RENTAL_FINISH = RENTAL_START + timedelta(hours=2)
-RENTAL_HOURS = 2
 
 @pytest.fixture
 def started_rental(station, busy_slot, available_item, active_tariff, user):
@@ -69,8 +62,8 @@ def started_rental_event(started_rental):
     """
     return RentalEvent.log(
         rental=started_rental,
-        type=EventType.STARTED,
-        created_at=started_rental.rental_start
+        event_type=EventType.STARTED,
+        started_at=started_rental.rental_start
     )
 
 @pytest.fixture
@@ -83,6 +76,7 @@ def finished_rental_event(finished_rental):
     """
     return RentalEvent.log(
         rental=finished_rental,
-        type=EventType.FINISHED,
+        event_type=EventType.FINISHED,
+        finished_at=finished_rental.rental_finish,
         total_amount=finished_rental.price_per_unit * RENTAL_HOURS,
     )
