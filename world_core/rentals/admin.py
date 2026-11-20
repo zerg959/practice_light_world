@@ -6,7 +6,7 @@ class RentalEventInline(admin.TabularInline):
     model = RentalEvent
     extra = 0
     can_delete = False
-    fields = ("type", "started_at", "finished_at",
+    fields = ("event_type", "started_at", "finished_at",
               "price_per_unit", "unit", "total_amount", "created_at")
     readonly_fields = fields
 
@@ -35,8 +35,8 @@ class RentalAdmin(admin.ModelAdmin):
 
 @admin.register(RentalEvent)
 class RentalEventAdmin(admin.ModelAdmin):
-    list_display = ("rental", "type", "started_at", "finished_at", "total_amount")
-    list_filter = ("type",)
+    list_display = ("rental", "event_type", "started_at", "finished_at", "total_amount")
+    list_filter = ("event_type",)
     search_fields = ("rental__id",)
     ordering = ("-started_at",)
 
